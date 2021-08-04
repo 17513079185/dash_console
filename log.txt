@@ -1,0 +1,8 @@
+08/04/2021 06:51:37-root-DEBUG-logger:This is a debug level log
+08/04/2021 06:51:37-root-INFO-logger:This is a info level log
+08/04/2021 06:51:37-root-WARNING-logger:This is a warning level log
+08/04/2021 06:51:37-root-ERROR-logger:This is a error level log
+08/04/2021 06:51:37-root-CRITICAL-logger:This is a critical level log
+08/04/2021 06:51:37-uvicorn.error-INFO-server:Started server process [672]
+08/04/2021 06:51:37-uvicorn.error-INFO-on:Waiting for application startup.
+08/04/2021 06:51:37-uvicorn.error-INFO-on:Application startup complete.

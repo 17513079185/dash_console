@@ -1,0 +1,10 @@
+syntax: glob
+*.xml
+*.md
+*.sample
+*.pyc
+*.iml
+fastapi\.git\description
+fastapi\.git\HEAD
+fastapi\.git\index
+fastapi\.git\config
