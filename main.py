@@ -1,6 +1,12 @@
+import time
+from urllib.request import Request
+
+import jwt
 import uvicorn
+from ckeditor_demo.settings import SECRET_KEY
 from fastapi import FastAPI, Form
 from common.computetime import Computetime
+from common.localhost_user.user_login import login
 from common.localhost_user.user_register import UserRegister
 
 app = FastAPI()
@@ -26,10 +32,34 @@ async def register_user(
 
 
 @app.post("/login_user")
-async def login_user():
-    pass
+async def login_user(
+        user_name: str = Form(None),
+        password: str = Form(None)
+):
+    data = await login(user_name, password)
 
-    return True
+    return data
+
+
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next):
+
+    response = await call_next(request)
+
+    url = str(request.url)[22:]
+
+    if url == 'login_user':  # 屏蔽登录接口, 避免死循环
+
+        return response
+
+    token = request.headers['token']  # 获取前端传过来token
+    try:
+        e = jwt.decode(token, key=SECRET_KEY)
+        print(e)
+    except:
+        return False
+
+    return response
 
 
 if __name__ == "__main__":

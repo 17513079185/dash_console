@@ -1,6 +1,9 @@
+from hashlib import sha1
+from ckeditor_demo.settings import SECRET_KEY
 from db.mysql.ini import DBHandler
 import datetime
 import re
+
 
 
 class UserRegister:
@@ -17,6 +20,9 @@ class UserRegister:
             return {"msg": "注册信息重复", 'code': 402}
 
         date = datetime.datetime.now()
+
+        make_password = await UserRegister.make_password(password)  # 加密函数
+
         sql = f"""insert into `user`(`username`,`password`,`phone`,`email`, `level`, `createtime`) values (%s,%s,%s,%s,%s,%s)"""
 
         is_null = await UserRegister.is_UserNull(user_name, password, phone, email)
@@ -24,7 +30,7 @@ class UserRegister:
         if is_null:
             return is_null
 
-        Sqlerr = db.insert(sql, ({user_name}, {password}, {phone}, {email}, 1, date))
+        Sqlerr = db.insert(sql, ({user_name}, {make_password}, {phone}, {email}, 1, date))
 
         return {'msg': "注册成功", 'code': 10000}
 
@@ -50,3 +56,13 @@ class UserRegister:
         ex_email = re.compile(r'^[1-9][0-9]{4,10}@qq\.com')
         if not ex_email.match(email):
             return {'msg': '邮箱格式不对,仅限QQ邮箱', 'code': 401}
+
+    async def make_password(password):
+        # 1.加盐,SECRET_KEY为加盐字符串,from ads.settings import SECRET_KEY
+        password = SECRET_KEY + password
+        # 2.开始加密
+        sha1_obj = sha1()
+        sha1_obj.update(password.encode())
+        ret = sha1_obj.hexdigest()
+
+        return ret
