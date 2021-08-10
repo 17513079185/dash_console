@@ -1,13 +1,15 @@
-import time
 from urllib.request import Request
+from venv import logger
 
-import jwt
-import uvicorn
 from ckeditor_demo.settings import SECRET_KEY
 from fastapi import FastAPI, Form
+from starlette.responses import JSONResponse
 from common.computetime import Computetime
 from common.localhost_user.user_login import login
 from common.localhost_user.user_register import UserRegister
+import time
+import jwt
+import uvicorn
 
 app = FastAPI()
 
@@ -43,21 +45,21 @@ async def login_user(
 
 @app.middleware("http")
 async def add_process_time_header(request: Request, call_next):
-
     response = await call_next(request)
 
-    url = str(request.url)[22:]
+    login_url = str(request.url)[22:]
+    register_url = str(request.url)[22:]
 
-    if url == 'login_user':  # 屏蔽登录接口, 避免死循环
-
+    if login_url == 'login_user' or register_url == 'register_user':  # 屏蔽注册、登录接口, 避免死循环
         return response
 
-    token = request.headers['token']  # 获取前端传过来token
     try:
-        e = jwt.decode(token, key=SECRET_KEY)
-        print(e)
-    except:
-        return False
+        token = request.headers['token']  # 获取前端传过来token
+        jwt.decode(token, key=SECRET_KEY)
+
+    except Exception as e:
+        logger.warning(e)
+        return JSONResponse({'msg': 'token验证失败,请重新登陆!', 'code': 301})
 
     return response
 
